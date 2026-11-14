@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Spotify & Netflix Cookie Live Link Generator</title>
+    <title>Spotify, Netflix & Crunchyroll Cookie Live Link Generator</title>
     <style>
         body { background: #121212; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; margin: 0; }
         .card { background: #181818; padding: 30px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); width: 640px; border: 1px solid #282828; box-sizing: border-box; }
@@ -27,12 +27,12 @@
 
     <div class="card">
         <div class="top-bar">
-            <h2 id="mainTitle">Spotify & Netflix Live Link</h2>
+            <h2 id="mainTitle">Cookie Live Link Generator</h2>
             <a href="extension.zip" download="extension.zip" class="ext-btn" title="Download Chrome Extension">
                 🧩 Download Extension (.zip)
             </a>
         </div>
-        <p>Paste your Spotify or Netflix Netscape cookie text below:</p>
+        <p>Paste your <b>Spotify, Netflix</b> or <b>Crunchyroll</b> Netscape cookie text below:</p>
         <textarea id="cookieInput" placeholder="# Netscape HTTP Cookie File..."></textarea>
         <br>
         <button class="btn" id="generateBtn" onclick="processCookies()">Generate Live Access Link</button>
@@ -48,6 +48,14 @@
             <div class="status-msg" id="statusMsg"></div>
             <div class="link-box" id="liveLinkBox"></div>
         </div>
+        
+        <div class="instructions-box">
+            <b>💡 Extension එක install කරගන්නේ මෙහෙමයි:</b><br>
+            1. උඩ ඇති <b>Download Extension (.zip)</b> button එක ඔබා download කර unzip කරන්න.<br>
+            2. Chrome හි <code>chrome://extensions</code> වෙත ගොස් <b>Developer mode</b> On කරන්න.<br>
+            3. <b>Load unpacked</b> ක්ලික් කර unzip කළ extension folder එක තෝරන්න.
+        </div>
+    </div>
         
         <div class="instructions-box">
             <b>💡 Extension එක install කරගන්නේ මෙහෙමයි:</b><br>
@@ -88,10 +96,19 @@
         }
 
         function applyServiceTheme(service, meta) {
-            const isNetflix = service === "netflix";
-            const accentColor = isNetflix ? "#e50914" : "#1db954";
-            const btnTextColor = isNetflix ? "#fff" : "#000";
-            const serviceName = isNetflix ? "Netflix" : "Spotify";
+            let accentColor = "#1db954";
+            let btnTextColor = "#000";
+            let serviceName = "Spotify";
+
+            if (service === "netflix") {
+                accentColor = "#e50914";
+                btnTextColor = "#fff";
+                serviceName = "Netflix";
+            } else if (service === "crunchyroll") {
+                accentColor = "#f47521";
+                btnTextColor = "#fff";
+                serviceName = "Crunchyroll";
+            }
 
             const badge = document.getElementById('serviceBadge');
             badge.style.background = accentColor;
@@ -107,8 +124,8 @@
             launchBtn.innerText = `Open Live ${serviceName} Session`;
 
             document.getElementById('accountDetails').innerHTML = `
-                <p>Email: <b style="color:${accentColor}">${meta.email}</b></p>
-                <p>Plan: <b style="color:${accentColor}">${meta.plan}</b></p>
+                <p>Email / User: <b style="color:${accentColor}">${meta.email}</b></p>
+                <p>Plan / Status: <b style="color:${accentColor}">${meta.plan}</b></p>
                 <p>Country: <b style="color:${accentColor}">${meta.country}</b></p>
                 ${meta.expire ? `<p>Expire: <b style="color:${accentColor}">${meta.expire}</b></p>` : ''}
             `;
@@ -118,15 +135,22 @@
             const raw = document.getElementById('cookieInput').value;
             parsedCookies = parseNetscape(raw);
 
-            const hasNetflix = parsedCookies.some(c => c.name === "NetflixId" || c.domain.includes("netflix.com"));
-            const hasSpotify = parsedCookies.some(c => c.name === "sp_dc" || c.domain.includes("spotify.com"));
+            const hasCrunchyroll = parsedCookies.some(c => (c.domain && c.domain.includes("crunchyroll.com")) || c.name === "c_cloud_auth" || c.name === "cx_tokenId");
+            const hasNetflix = parsedCookies.some(c => (c.domain && c.domain.includes("netflix.com")) || c.name === "NetflixId");
+            const hasSpotify = parsedCookies.some(c => (c.domain && c.domain.includes("spotify.com")) || c.name === "sp_dc");
 
-            if (!hasNetflix && !hasSpotify) {
-                alert("Invalid cookies! Could not find Spotify (sp_dc) or Netflix (NetflixId) session tokens.");
+            if (!hasCrunchyroll && !hasNetflix && !hasSpotify) {
+                alert("Invalid cookies! Could not find Spotify (sp_dc), Netflix (NetflixId) or Crunchyroll (c_cloud_auth/cx_tokenId) cookies.");
                 return;
             }
 
-            currentService = hasNetflix ? "netflix" : "spotify";
+            if (hasCrunchyroll) {
+                currentService = "crunchyroll";
+            } else if (hasNetflix) {
+                currentService = "netflix";
+            } else {
+                currentService = "spotify";
+            }
 
             const emailMatch = raw.match(/EMAIL\s*:\s*([^\r\n]+)/i);
             const planMatch = raw.match(/PLAN\s*:\s*([^\r\n]+)/i);
@@ -205,7 +229,16 @@
                     const encodedData = window.location.hash.substring(6);
                     const payload = JSON.parse(decodeURIComponent(escape(atob(encodedData))));
                     parsedCookies = payload.cookies || payload;
-                    currentService = payload.service || (parsedCookies.some(c => c.domain.includes("netflix.com")) ? "netflix" : "spotify");
+                    
+                    if (payload.service) {
+                        currentService = payload.service;
+                    } else if (parsedCookies.some(c => (c.domain && c.domain.includes("crunchyroll.com")) || c.name === "c_cloud_auth" || c.name === "cx_tokenId")) {
+                        currentService = "crunchyroll";
+                    } else if (parsedCookies.some(c => (c.domain && c.domain.includes("netflix.com")) || c.name === "NetflixId")) {
+                        currentService = "netflix";
+                    } else {
+                        currentService = "spotify";
+                    }
 
                     const meta = payload.meta || { email: "Live Link User", plan: "Premium", country: "Verified" };
                     applyServiceTheme(currentService, meta);
