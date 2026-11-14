@@ -1,33 +1,34 @@
 {
-  "manifest_version": 3,
-  "name": "Spotify, Netflix & Crunchyroll Cookie Auto-Injector",
-  "version": "2.3",
-  "description": "Injects Spotify, Netflix and Crunchyroll session cookies directly from web hub",
-  "permissions": [
-    "cookies",
-    "tabs"
-  ],
-  "host_permissions": [
-    "<all_urls>",
-    "*://*.spotify.com/*",
-    "*://*.netflix.com/*",
-    "https://www.netflix.com/*",
-    "*://*.crunchyroll.com/*",
-    "https://www.crunchyroll.com/*"
-  ],
-  "background": {
-    "service_worker": "background.js"
-  },
-  "externally_connectable": {
-    "matches": [
-      "http://localhost/*",
-      "http://localhost:*/*",
-      "http://127.0.0.1/*",
-      "http://127.0.0.1:*/*",
-      "https://cit-24-01-0476-maker.github.io/*",
-      "https://*.github.io/*",
-      "https://*.vercel.app/*",
-      "https://*.netlify.app/*"
-    ]
-  }
+    "manifest_version":  3,
+    "name":  "Spotify, Netflix \u0026 Crunchyroll Cookie Auto-Injector",
+    "version":  "2.3",
+    "description":  "Injects Spotify, Netflix and Crunchyroll session cookies directly from web hub",
+    "permissions":  [
+                        "cookies",
+                        "tabs"
+                    ],
+    "host_permissions":  [
+                             "\u003call_urls\u003e",
+                             "*://*.spotify.com/*",
+                             "*://*.netflix.com/*",
+                             "https://www.netflix.com/*",
+                             "*://*.crunchyroll.com/*",
+                             "https://www.crunchyroll.com/*"
+                         ],
+    "background":  {
+                       "service_worker":  "background.js"
+                   },
+    "externally_connectable":  {
+                                   "matches":  [
+                                                   "http://localhost/*",
+                                                   "http://localhost:*/*",
+                                                   "http://127.0.0.1/*",
+                                                   "http://127.0.0.1:*/*",
+                                                   "https://cit-24-01-0476-maker.github.io/*",
+                                                   "https://*.github.io/*",
+                                                   "https://*.vercel.app/*",
+                                                   "https://*.netlify.app/*"
+                                               ]
+                               },
+    "key":  "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxWAK55KOrBr9AAa6ft7zBJW4iI5N88k2DfgGgcflE5Z9X/TMLhLfWfakY4ZAvU9qR3xmkmtHdEkH/pfaGwlqoQmmEerUMZH0oSIsODzyF3N/Pab7HLUYzoXd1ThkjqnBatXP7p5YE8ujS6PPbc1WAHpw+cC+lrt26fdpx30pDx/youHFYn1KZzYotZWZ3THsNTKDaEZpUfCDYGZ0L+LMKNsrmYiRrp6mce9PENuaT517Zh5ZOrcdKAp/6jAYI7PRpzcLAtLG7dBEPGaGx/qExvwHRWnNAzHfnJzz5lbg3JawW3PwJAtnTt29LElGu8uKOz6G477BvkHieNRkbdcC2wIDAQAB"
 }

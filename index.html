@@ -56,18 +56,14 @@
             3. <b>Load unpacked</b> ක්ලික් කර unzip කළ extension folder එක තෝරන්න.
         </div>
     </div>
-        
-        <div class="instructions-box">
-            <b>💡 Extension එක install කරගන්නේ මෙහෙමයි:</b><br>
-            1. උඩ ඇති <b>Download Extension (.zip)</b> button එක ඔබා download කර unzip කරන්න.<br>
-            2. Chrome හි <code>chrome://extensions</code> වෙත ගොස් <b>Developer mode</b> On කරන්න.<br>
-            3. <b>Load unpacked</b> ක්ලික් කර unzip කළ extension folder එක තෝරන්න.
-        </div>
-    </div>
 
     <script>
-        // ඔයාගේ Extension ID එක
-        const EXTENSION_ID = "ifpoegennbpihhmmlfbmepblipibaljn";
+        // Extension ID (Matches manifest public key and local installed ID)
+        const EXTENSION_IDS = [
+            "nmnjndbeaglfhlakkabhpjmchbpdkhbc", // New Fixed Extension ID (Generated from manifest key)
+            "ogblncpgckakdmlgbgkadkgpjcodmabp", // Your current local installed unpacked extension ID
+            "ifpoegennbpihhmmlfbmepblipibaljn"  // Fallback ID
+        ];
 
         let parsedCookies = [];
         let currentService = "spotify";
@@ -180,26 +176,24 @@
             document.getElementById('statusMsg').innerText = "";
         }
 
-        function launchSession() {
+        function trySendMessage(idIndex) {
             const status = document.getElementById('statusMsg');
-            status.style.color = "#ffa500";
-            status.innerText = `Injecting ${currentService.toUpperCase()} cookies via extension...`;
-
-            if (typeof chrome === "undefined" || !chrome.runtime || !chrome.runtime.sendMessage) {
+            if (idIndex >= EXTENSION_IDS.length) {
                 status.style.color = "#ff5555";
-                status.innerHTML = "⚠️ <b>Chrome Extension එක හමු නොවුණි!</b><br>කරුණාකර ඉහත ඇති <b>Download Extension</b> button එකෙන් extension එක install කරගෙන Reload කරන්න.";
+                status.innerHTML = `⚠️ <b>Extension error: Could not establish connection.</b><br>
+                <small>1. Extension එක <code>chrome://extensions</code> හි active බවත්, Developer mode On බවත් තහවුරු කරගන්න.<br>
+                2. උඩ ඇති <b>Download Extension (.zip)</b> button එකෙන් අලුත් extension එක download කර Reload 🔄 කරන්න.</small>`;
                 return;
             }
 
+            const currentExtId = EXTENSION_IDS[idIndex];
             chrome.runtime.sendMessage(
-                EXTENSION_ID,
+                currentExtId,
                 { action: "inject_cookies", service: currentService, cookies: parsedCookies },
                 (response) => {
                     if (chrome.runtime.lastError) {
-                        status.style.color = "#ff5555";
-                        status.innerHTML = `⚠️ <b>Extension error:</b> ${chrome.runtime.lastError.message}<br>
-                        <small>1. Extension එක <code>chrome://extensions</code> වල install කර Reload 🔄 කර ඇත්දැයි බලන්න.<br>
-                        2. Extension ID එක index.html හි EXTENSION_ID එකට සමාන දැයි පරීක්ෂා කරන්න.</small>`;
+                        // ඊළඟ ID එකෙන් උත්සාහ කිරීම
+                        trySendMessage(idIndex + 1);
                         return;
                     }
 
@@ -212,6 +206,20 @@
                     }
                 }
             );
+        }
+
+        function launchSession() {
+            const status = document.getElementById('statusMsg');
+            status.style.color = "#ffa500";
+            status.innerText = `Injecting ${currentService.toUpperCase()} cookies via extension...`;
+
+            if (typeof chrome === "undefined" || !chrome.runtime || !chrome.runtime.sendMessage) {
+                status.style.color = "#ff5555";
+                status.innerHTML = "⚠️ <b>Chrome Extension එක හමු නොවුණි!</b><br>කරුණාකර Google Chrome browser එකෙන් open කර extension එක install කරගන්න.";
+                return;
+            }
+
+            trySendMessage(0);
         }
 
         function copyLiveLink() {
