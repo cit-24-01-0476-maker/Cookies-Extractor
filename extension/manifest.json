@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Spotify & Netflix Cookie Auto-Injector",
+  "version": "2.2",
+  "description": "Injects Spotify and Netflix session cookies directly from web hub",
+  "permissions": [
+    "cookies",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "*://*.spotify.com/*",
+    "*://*.netflix.com/*",
+    "https://www.netflix.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "externally_connectable": {
+    "matches": [
+      "http://localhost/*",
+      "http://localhost:*/*",
+      "http://127.0.0.1/*",
+      "http://127.0.0.1:*/*",
+      "https://cit-24-01-0476-maker.github.io/*",
+      "https://*.github.io/*",
+      "https://*.vercel.app/*",
+      "https://*.netlify.app/*"
+    ]
+  }
+}
